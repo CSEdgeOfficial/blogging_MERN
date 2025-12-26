@@ -15,7 +15,11 @@ export default function Signup() {
 
     try {
       await api.post("/signup", { name, email, password });
-      navigate("/login");
+      // Now log them in
+      const loginRes = await api.post("/login", { email, password });
+      localStorage.setItem("token", loginRes.data.token);
+      localStorage.setItem("user", JSON.stringify(loginRes.data.user));
+      navigate("/");
     } catch (error) {
       setError(error.response?.data?.message || "Signup failed");
     }

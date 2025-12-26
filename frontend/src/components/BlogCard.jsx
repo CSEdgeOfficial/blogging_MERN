@@ -3,6 +3,8 @@ import api from "../api/axios";
 
 export default function BlogCard({ blog, onDelete }) {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAuthor = user && blog.author?._id === user.id;
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
@@ -11,7 +13,9 @@ export default function BlogCard({ blog, onDelete }) {
       await api.delete(`/blogs/${blog._id}`);
       if (onDelete) onDelete(blog._id);
     } catch (error) {
-      alert("Failed to delete post");
+      console.error("Failed to delete post:", error);
+      const errorMsg = error.response?.data?.message || "Failed to delete post";
+      alert(errorMsg);
     }
   };
 
@@ -26,20 +30,22 @@ export default function BlogCard({ blog, onDelete }) {
         {blog.content.substring(0, 200)}
         {blog.content.length > 200 && "..."}
       </p>
-      <div className="flex gap-2">
-        <button
-          onClick={() => navigate(`/edit/${blog._id}`)}
-          className="text-blue-600 hover:text-blue-800 text-sm"
-        >
-          Edit
-        </button>
-        <button
-          onClick={handleDelete}
-          className="text-red-600 hover:text-red-800 text-sm"
-        >
-          Delete
-        </button>
-      </div>
+      {isAuthor && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/edit/${blog._id}`)}
+            className="text-blue-600 hover:text-blue-800 text-sm"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            className="text-red-600 hover:text-red-800 text-sm"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

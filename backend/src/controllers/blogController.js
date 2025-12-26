@@ -47,7 +47,7 @@ const deleteBlog = async (req, res) => {
     if (!blog) return res.status(404).json({ message: "Not found" });
     if (String(blog.author) !== String(req.userId))
       return res.status(403).json({ message: "Forbidden" });
-    await blog.remove();
+    await Blog.deleteOne({ _id: id });
     res.json({ message: "Deleted" });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
